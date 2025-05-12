@@ -1,0 +1,9 @@
+
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+#preview img {
+  width: 100px;
+  margin: 5px;
+}

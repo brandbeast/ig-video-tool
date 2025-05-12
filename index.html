@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IG Video Creator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>IG Video Creator</h1>
+  <input type="file" id="fileInput" multiple accept="image/*" />
+  <input type="text" id="textOverlay" placeholder="Enter overlay text" />
+  <button id="createBtn">▶️ Create Video</button>
+  <div id="preview"></div>
+  <p id="status"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.5/dist/ffmpeg.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
