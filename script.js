@@ -1,4 +1,3 @@
-
 const fileInput = document.getElementById('fileInput');
 const createBtn = document.getElementById('createBtn');
 const preview = document.getElementById('preview');
@@ -13,17 +12,23 @@ fileInput.addEventListener('change', async (e) => {
 
   for (const file of selected) {
     if (file.name.endsWith('.heic')) {
-      const blob = await heic2any({ blob: file, toType: 'image/jpeg' });
-      const converted = new File([blob], file.name.replace(/\.heic$/, '.jpg'), { type: 'image/jpeg' });
-      files.push(converted);
+      try {
+        const blob = await heic2any({ blob: file, toType: 'image/jpeg' });
+        const converted = new File([blob], file.name.replace(/\.heic$/, '.jpg'), { type: 'image/jpeg' });
+        files.push(converted);
 
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = document.createElement('img');
-        img.src = event.target.result;
-        preview.appendChild(img);
-      };
-      reader.readAsDataURL(converted);
+        // Use FileReader for base64 preview (fixes .heic preview issues)
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(converted);
+      } catch (err) {
+        console.error("HEIC conversion error:", err);
+        status.textContent = "❌ Failed to convert .heic file.";
+      }
     } else if (file.type.startsWith('image/')) {
       files.push(file);
       const img = document.createElement('img');
@@ -42,7 +47,7 @@ createBtn.addEventListener('click', async () => {
     corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
   });
 
-  status.textContent = "Loading video engine...";
+  status.textContent = "⚙️ Loading video engine...";
   await ffmpeg.load();
 
   for (let i = 0; i < files.length; i++) {
@@ -62,7 +67,7 @@ createBtn.addEventListener('click', async () => {
     `concat=n=${files.length}:v=1:a=0[out]`;
 
   try {
-    status.textContent = "Rendering video...";
+    status.textContent = "🎬 Rendering video (30–60 seconds)...";
     await ffmpeg.run(
       ...inputs,
       "-filter_complex", filterComplex,
@@ -73,12 +78,15 @@ createBtn.addEventListener('click', async () => {
 
     const data = ffmpeg.FS('readFile', 'output.mp4');
     const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+
     const a = document.createElement('a');
     a.href = url;
     a.download = 'video.mp4';
-    a.textContent = "⬇ Download Your Video";
+    a.textContent = "⬇️ Download Your Video";
     a.style.display = "block";
+    a.style.marginTop = "20px";
     document.body.appendChild(a);
+
     status.textContent = "✅ Done!";
   } catch (err) {
     console.error("Render failed:", err);
