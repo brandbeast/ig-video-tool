@@ -51,7 +51,9 @@ createBtn.addEventListener('click', async () => {
   await ffmpeg.load();
 
   for (let i = 0; i < files.length; i++) {
-    ffmpeg.FS('writeFile', `img${i}.jpg`, await fetchFile(files[i]));
+    const arrayBuffer = await files[i].arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    ffmpeg.FS('writeFile', `img${i}.jpg`, uint8Array);
   }
 
   const inputs = [];
